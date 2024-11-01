@@ -6,6 +6,7 @@ using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
 using PersistentEmpiresLib.SceneScripts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -69,7 +70,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
             }
             else
             {
-                frame = persistentEmpireRepresentative.GetNextSpawnFrame();
+                frame = persistentEmpireRepresentative.GetNextSpawFrame();
                 if (frame.GetCastleBanner() != null && frame.GetCastleBanner().FactionIndex != persistentEmpireRepresentative.GetFactionIndex()) frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[0];
             }
             return frame.GameEntity.GetGlobalFrame();
@@ -129,12 +130,19 @@ namespace PersistentEmpiresServer.SpawnBehavior
                                 Debug.FailedAssert("PE Spawn frame could not be found.", "C:\\Develop\\MB3\\Source\\Bannerlord\\TaleWorlds.MountAndBlade\\Missions\\Multiplayer\\SpawnBehaviors\\SpawningBehaviors\\SpawningBehaviorBase.cs", "OnTick", 194);
                             }
                         }
+
+                        Debug.Print($"loadFromDb:{persistentEmpireRepresentative.LoadFromDb}");
+
                         if (persistentEmpireRepresentative.LoadFromDb)
                         {
+                            Debug.Print($"loadDb:{persistentEmpireRepresentative.LoadedDbPosition}, disconnected:{persistentEmpireRepresentative.DisconnectedAt}, current:{DateTimeOffset.UtcNow.ToUnixTimeSeconds()} , pos:{this.PersistPosition}");
+
                             if (persistentEmpireRepresentative.LoadedDbPosition == new Vec3(0, 0, 0) || persistentEmpireRepresentative.DisconnectedAt + (30 * 60) < DateTimeOffset.UtcNow.ToUnixTimeSeconds() || this.PersistPosition)
                             {
-                                Debug.Print(String.Format("SELECTED POSITION FOR {0} => ({1},{2},{3})", component.DisplayedName, spawnFrame.origin.x, spawnFrame.origin.y, spawnFrame.origin.z));
-                                agentBuildData.InitialPosition(spawnFrame.origin);
+                                // currently it seems position is taken from client not server, they are not equal therefore spawn is defaulted to castle
+                                // to test : use persistentEmpireRepresentative.LoadedDbPosition instead //spawnFrame.origin
+                                Debug.Print(String.Format("SELECTED POSITION FOR {0} => ({1},{2},{3})", component.DisplayedName, persistentEmpireRepresentative.LoadedDbPosition.x, persistentEmpireRepresentative.LoadedDbPosition.y, persistentEmpireRepresentative.LoadedDbPosition.z));
+                                agentBuildData.InitialPosition(persistentEmpireRepresentative.LoadedDbPosition);
                             }
                             else
                             {
