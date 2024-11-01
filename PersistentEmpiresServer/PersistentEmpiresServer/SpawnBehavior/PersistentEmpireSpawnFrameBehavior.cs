@@ -70,7 +70,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
             }
             else
             {
-                frame = persistentEmpireRepresentative.GetNextSpawFrame();
+                frame = persistentEmpireRepresentative.GetNextSpawnFrame();
                 if (frame.GetCastleBanner() != null && frame.GetCastleBanner().FactionIndex != persistentEmpireRepresentative.GetFactionIndex()) frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[0];
             }
             return frame.GameEntity.GetGlobalFrame();
@@ -118,7 +118,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
                         MatrixFrame spawnFrame = this.GetSpawnFrame(networkCommunicator);
                         if (spawnFrame.IsIdentity)
                         {
-                            Debug.FailedAssert("Spawn frame could not be found.", "C:\\Develop\\MB3\\Source\\Bannerlord\\TaleWorlds.MountAndBlade\\Missions\\Multiplayer\\SpawnBehaviors\\SpawningBehaviors\\SpawningBehaviorBase.cs", "OnTick", 194);
+                            TaleWorlds.Library.Debug.FailedAssert("Spawn frame could not be found.", "C:\\Develop\\MB3\\Source\\Bannerlord\\TaleWorlds.MountAndBlade\\Missions\\Multiplayer\\SpawnBehaviors\\SpawningBehaviors\\SpawningBehaviorBase.cs", "OnTick", 194);
                         }
                         Vec2 v;
                         if (!(spawnFrame.origin != agentBuildData.AgentInitialPosition))
@@ -127,21 +127,16 @@ namespace PersistentEmpiresServer.SpawnBehavior
                             Vec2? agentInitialDirection = agentBuildData.AgentInitialDirection;
                             if (!(v != agentInitialDirection))
                             {
-                                Debug.FailedAssert("PE Spawn frame could not be found.", "C:\\Develop\\MB3\\Source\\Bannerlord\\TaleWorlds.MountAndBlade\\Missions\\Multiplayer\\SpawnBehaviors\\SpawningBehaviors\\SpawningBehaviorBase.cs", "OnTick", 194);
+                                TaleWorlds.Library.Debug.FailedAssert("PE Spawn frame could not be found.", "C:\\Develop\\MB3\\Source\\Bannerlord\\TaleWorlds.MountAndBlade\\Missions\\Multiplayer\\SpawnBehaviors\\SpawningBehaviors\\SpawningBehaviorBase.cs", "OnTick", 194);
                             }
                         }
 
-                        Debug.Print($"loadFromDb:{persistentEmpireRepresentative.LoadFromDb}");
-
                         if (persistentEmpireRepresentative.LoadFromDb)
                         {
-                            Debug.Print($"loadDb:{persistentEmpireRepresentative.LoadedDbPosition}, disconnected:{persistentEmpireRepresentative.DisconnectedAt}, current:{DateTimeOffset.UtcNow.ToUnixTimeSeconds()} , pos:{this.PersistPosition}");
-
                             if (persistentEmpireRepresentative.LoadedDbPosition == new Vec3(0, 0, 0) || persistentEmpireRepresentative.DisconnectedAt + (30 * 60) < DateTimeOffset.UtcNow.ToUnixTimeSeconds() || this.PersistPosition)
                             {
-                                // currently it seems position is taken from client not server, they are not equal therefore spawn is defaulted to castle
-                                // to test : use persistentEmpireRepresentative.LoadedDbPosition instead //spawnFrame.origin
-                                Debug.Print(String.Format("SELECTED POSITION FOR {0} => ({1},{2},{3})", component.DisplayedName, persistentEmpireRepresentative.LoadedDbPosition.x, persistentEmpireRepresentative.LoadedDbPosition.y, persistentEmpireRepresentative.LoadedDbPosition.z));
+                                // loading spawn location form DB
+                                TaleWorlds.Library.Debug.Print(String.Format("SELECTED POSITION FOR {0} => ({1},{2},{3})", component.DisplayedName, persistentEmpireRepresentative.LoadedDbPosition.x, persistentEmpireRepresentative.LoadedDbPosition.y, persistentEmpireRepresentative.LoadedDbPosition.z));
                                 agentBuildData.InitialPosition(persistentEmpireRepresentative.LoadedDbPosition);
                             }
                             else
@@ -160,7 +155,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
 
                         LoggerHelper.LogAnAction(networkCommunicator, LogAction.PlayerSpawn, null, new object[] { agent });
 
-                        Debug.Print("AGENT INDEX " + agent.Index + " SPAWNED FOR PLAYER " + agent.MissionPeer.GetNetworkPeer().UserName);
+                        TaleWorlds.Library.Debug.Print("AGENT INDEX " + agent.Index + " SPAWNED FOR PLAYER " + agent.MissionPeer.GetNetworkPeer().UserName);
 
                         if (mountAgent != null)
                         {
@@ -245,7 +240,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
 
                         if (selectedCharacterObject == null)
                         {
-                            Debug.Print("*PERSISTENT EMPIRES* Player class is null", 0, Debug.DebugColor.Red);
+                            TaleWorlds.Library.Debug.Print("*PERSISTENT EMPIRES* Player class is null", 0, TaleWorlds.Library.Debug.DebugColor.Red);
                             selectedCharacterObject = MBObjectManager.Instance.GetObject<BasicCharacterObject>(PersistentEmpireBehavior.DefaultClass);
                         }
 
